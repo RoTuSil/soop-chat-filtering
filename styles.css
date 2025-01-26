@@ -1,0 +1,351 @@
+body {
+  
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0 10px 10px;
+    width: 300px;
+    -ms-overflow-style: none;
+    background: linear-gradient(135deg, #3b82f6, #22d3ee);
+    text-align: center;
+    color: #ECF0F1  ;
+    overflow-y: auto;
+}
+body::-webkit-scrollbar {
+    display: none;
+  }
+
+
+li {
+    background: linear-gradient(135deg, #bfdbfe ,#e0f2fe );
+    margin: 5px auto 0 auto;
+    padding: 0px;
+    width:90%;
+    border-radius: 10px;
+    text-align:left;
+    color:#1e3a8a ;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+li.removing {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+button {
+    width: calc(100% - 22px);
+    padding: 5px;
+}
+p {
+    font-size:large
+}
+
+.li-table {
+    width:100%;
+    margin:0px;
+    height:50%;
+}
+.li-id {
+    width: 60%;
+    text-align:left;
+    height:100%;
+    font-size: 1.5em;
+    margin-left: 1rem;
+    padding: 0 0 0 1rem;
+    pointer-events: none;
+}
+.li-button {
+    text-align: right;
+    width: 20%;
+    height:100%;
+}
+.li-remove-button {
+    width:2rem;
+    height:2rem;
+    vertical-align:middle;
+    margin: 0 auto;
+}
+
+.error {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding: 9px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    background: #EF665B;
+    border-radius: 8px;
+    box-shadow: 0px 0px 5px -3px #111;
+    bottom: -100px;
+    position: fixed;
+    width: calc(100% - 20px);   
+    box-sizing: border-box;
+    transition: bottom 0.5s ease-in-out;
+
+}
+
+.error.show {
+    bottom: 20px; /* 화면 안으로 들어오는 위치 */
+  }
+
+.error__icon {
+    width: 20px;
+    height: 20px;
+    transform: translateY(-2px);
+    margin-right: 8px;
+}
+
+.error__icon path {
+    fill: #fff;
+}
+
+.error__title {
+    font-weight: 500;
+    font-size: 14px;
+    color: #fff;
+}
+
+.error__close {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.error__close path {
+    fill: #fff;
+}
+.input__group {
+    position: relative;
+    padding: 20px 0 20px 0;
+    width: 100%;
+
+}
+.input__field {
+    font-family: inherit;
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #9b9b9b;
+    outline: 0;
+    font-size: 17px;
+    color: #1e3a8a  ;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+    border-color : #B0C4DE;
+  }
+  .input__field::placeholder {
+    color: transparent;
+  }
+
+  .input__field:placeholder-shown ~ .input__label {
+    font-size: 17px;
+    cursor: text;
+    top: 20px;
+  }
+  
+  .input__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 17px;
+    color: #B0C4DE ;
+    pointer-events: none;
+  }
+  
+  .input__field:focus {
+    padding-bottom: 6px;
+    font-weight: 700;
+    border-width: 3px;
+    border-image: linear-gradient(to right, #116399, #38caef);
+    border-image-slice: 1;
+  }
+  
+  .input__field:focus ~ .input__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 17px;
+    color: #38caef;
+    font-weight: 700;
+  }
+  
+  /* reset input */
+  .input__field:required, .input__field:invalid {
+    box-shadow: none;
+  }
+
+  .import-export {
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+  .import-export td {
+    padding: 0;
+    margin: 0;
+}
+#addButton, #export, #import{
+  outline: none;
+  background-color: #e0f2fe;
+  border: 1px solid #38bdf8;
+  padding: 10px;
+  border-radius: 10px;
+  color: #1e3a8a;
+  font-size: 16px;
+  transform: .3s ease;
+  transition-duration: 200ms;
+}
+#addButton:hover, #export:hover, #import:hover{
+  outline: none;
+  background-color: #b3dff8;
+  border: 1px solid #38bdf8;
+  padding: 10px;
+  border-radius: 10px;
+  color: #1e3a8a;
+  font-size: 16px;
+  transform: .3s ease;
+  transition-duration: 200ms;
+}
+
+
+
+.li-remove-button {
+  width: 50px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+  background: #1ABC9C  ;
+  position:relative;
+ }
+ 
+ .li-remove-button .remove-text{
+  transition: 100ms;
+ }
+ .li-remove-button span {
+  transition: 100ms;
+ }
+ 
+ .li-remove-button .remove-text {
+  transform: translateX(0px);
+  width:40px;
+  color: transparent;
+  font-weight: bold;
+ }
+ 
+ .li-remove-button .remove-icon {
+  position: absolute;
+  height: 20px;
+  width: 40px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+ }
+ 
+ .li-remove-button svg {
+  width: 15px;
+  fill: #eee;
+ }
+ 
+ .li-remove-button:hover {
+  background-color: #d45656;
+ }
+ 
+ .li-remove-button:hover .remove-text {
+  color: white;
+  width:40px;
+ }
+ 
+ .li-remove-button:hover .remove-icon {
+  transform: translateX(0);
+  display: none;
+ }
+ 
+ .li-remove-button:focus {
+  outline: none;
+ }
+ 
+ .li-remove-button:active .remove-icon svg {
+  transform: scale(0.8);
+ }
+.list {
+  box-sizing:content-box;
+  list-style-type:none;
+  padding: 0 0 0 8px;
+  max-height: 270px;
+  overflow-y: auto;
+}
+.list::-webkit-scrollbar {
+  width: 8px;
+  height: var(--w-scrollbar);
+  border-radius: 9999px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: #0000;
+}
+.list::-webkit-scrollbar-thumb {
+  background: #c1c2c5;
+border-radius: 9999px;
+}
+.list:hover::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+}
+h1 {
+  margin: 10px 0 0 0;
+}
+
+.switch {
+  --false: #E81B1B;
+  --true: #009068;
+ }
+ 
+ input[type=checkbox] {
+  appearance: none;
+  height: 1.5rem;
+  width: 3.5rem;
+  background-color: #fff;
+  position: relative;
+  border-radius: .2em;
+  cursor: pointer;
+ }
+ 
+ input[type=checkbox]::before {
+  content: '';
+  display: block;
+  height: 1.4em;
+  width: 1.4em;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%;
+  left: calc(1.4em/2 + .2em);
+  background-color: var(--false);
+  border-radius: .2em;
+  transition: .3s ease;
+ }
+ 
+ input[type=checkbox]:checked::before {
+  background-color: var(--true);
+  left: calc(100% - (1.4em/2 + .2em));
+ }
+ .toggle {
+  margin: 0;
+ }
+
+ tr {
+  margin:0;
+  padding:0;
+ }
+
+ .svgIcon {
+  width: 12px;
+  transition-duration: 0.3s;
+}
+
+.svgIcon path {
+  fill: white;
+}
