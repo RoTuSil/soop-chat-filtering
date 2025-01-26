@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Hello Extensions",
-    "description": "Base Level Extension",
+    "name": "SOOP 채팅 콜렉터",
+    "description": "지정한 ID의 채팅만을 따로 보여주는 확장 프로그램입니다.",
     "version": "1.0",
     "action": {
       "default_icon": "icon.png",
@@ -17,11 +17,12 @@
       }
     ],
 
+    
+
+    "permissions": ["activeTab", "scripting", "storage", "contextMenus","downloads"],
     "background" : {
       "service_worker": "background.js"
     },
-
-    "permissions": ["activeTab", "scripting", "storage", "contextMenus","downloads"],
     "icons": {
       "16": "icon.png",
       "48": "icon.png",

@@ -37,6 +37,64 @@ style.textContent = `
         background-size: 70% 70%;
 
     }
+    
+    /* From Uiverse.io by andrew-demchenk0 */ 
+    .info__div {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        width: 100%;
+        padding: 12px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: start;
+        
+        border-radius: 8px;
+        box-shadow: 0px 0px 5px -3px #111;
+        position:absolute;
+        transition: bottom 0.3s ease;
+
+        bottom:-50px;
+        z-index:1000;
+    }
+    .info__div.show {
+        bottom:20px;
+    }
+    .info__div.good {
+        background: #509AF8;
+    }
+
+    .info__div.bad {
+        background: #EF665B;
+    }
+    
+
+    .info__icon {
+        width: 20px;
+        height: 20px;
+        transform: translateY(-2px);
+        margin-right: 8px;
+    }
+
+    .info__icon path {
+        fill: #fff;
+    }
+
+    .info__title {
+        font-weight: 500;
+        font-size: 14px;
+        color: #fff;
+    }
+
+    .info__close {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    .info__close path {
+        fill: #fff;
+    }
 `;
 document.head.appendChild(style);
 
@@ -75,6 +133,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 
 chrome.storage.local.get('option', (result) => {
+
     console.log('읽어온 option:', result.option);
     if (result.option) {
         option = result.option;
@@ -84,6 +143,9 @@ chrome.storage.local.get('option', (result) => {
             filterManager: false,
             chatLocation: false,
         }
+        chrome.storage.local.set({option: option}, function() {
+            console.log('설정 업데이트 됨 : ', option);
+        });
     }
     if(option.chatLocation) {
         console.log("상단에 위치");
@@ -109,7 +171,7 @@ function resize(event) {
     const newHeight = (event.clientY  - containerRect.top) / containerRect.height;
     
     // 상한 및 하한 설정
-    if (newHeight > .1 && newHeight < .9) {
+    if (newHeight > .05 && newHeight < .95) {
 
         if(option.chatLocation) {
             filtered.style.height = ((1 - newHeight)*100) + '%';
@@ -217,6 +279,10 @@ chrome.storage.local.get('idList', (result) => {
     }
     else {
         console.log('idList가 없습니다.');
+        idList = [];
+        chrome.storage.local.set({idList: idList}, function() {
+            console.log(`리스트에 ${id} 추가됨`);
+        });
     }
 });
 
@@ -231,8 +297,6 @@ tempLi.appendChild(captureButton);
 document.querySelector('.item_box').appendChild(tempLi);
 
 
-
-let time;
 
 captureButton.addEventListener('click', () => {
     downLoadFilteredChat();
@@ -327,18 +391,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (window.__clickedElement) {
             let id = window.__clickedElement.parentNode.getAttribute('user_id');
             if(id) {
-                console.log('우클릭된 요소 정보:', id);
                 let idOrigin = id.replace(/\(.*$/, '');
                 if(idList.includes(idOrigin)) {
-                    console.log('이미 존재하는 id');
+                    showNoti("이미 존재하는 ID입니다!", true);
                     return;
                 }
                 idList.push(idOrigin);
                 chrome.storage.local.set({idList: idList}, function() {
-                    console.log(`리스트에 ${id} 추가됨`);
+                    showNoti("리스트에 " + idOrigin + " 추가됨", false);
+                    
+
                 });
             } else {
-                console.log("id가 없음");
+                showNoti("ID를 찾을 수 없습니다!", true);
             }
         } else {
             console.log('우클릭된 요소 정보가 없음');
@@ -346,4 +411,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 });
 
+let timeoutId;
+function showNoti(text, isBad) {
+    let info = document.querySelector(".info__div");
+    info.classList.add("show");
+    info.querySelector(".info__title").textContent = text;
+    info.classList.remove("bad","good");
+    if(isBad) {
+        info.classList.add("bad");
+    } else {
+        info.classList.add("good");
+    }
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {removeNoti();}, 5000);
+}
+
+function removeNoti() {
+    document.querySelector(".info__div").classList.remove("show");
+}
+
+window.onload = () => {
+    let outerDiv = document.createElement("div");
+    outerDiv.classList.add("info__div");
+
+    outerDiv.innerHTML = '<div class="info__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#393a37" d="m12 1.5c-5.79844 0-10.5 4.70156-10.5 10.5 0 5.7984 4.70156 10.5 10.5 10.5 5.7984 0 10.5-4.7016 10.5-10.5 0-5.79844-4.7016-10.5-10.5-10.5zm.75 15.5625c0 .1031-.0844.1875-.1875.1875h-1.125c-.1031 0-.1875-.0844-.1875-.1875v-6.375c0-.1031.0844-.1875.1875-.1875h1.125c.1031 0 .1875.0844.1875.1875zm-.75-8.0625c-.2944-.00601-.5747-.12718-.7808-.3375-.206-.21032-.3215-.49305-.3215-.7875s.1155-.57718.3215-.7875c.2061-.21032.4864-.33149.7808-.3375.2944.00601.5747.12718.7808.3375.206.21032.3215.49305.3215.7875s-.1155.57718-.3215.7875c-.2061.21032-.4864.33149-.7808.3375z"></path></svg></div><div class="info__title">lorem ipsum dolor sit amet</div><div class="info__close"><svg height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z" fill="#393a37"></path></svg></div>';
+    container.appendChild(outerDiv);
+    outerDiv.querySelector(".info__close").addEventListener("click", removeNoti);
+}
 

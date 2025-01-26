@@ -1,36 +1,33 @@
 
-
-
 chrome.storage.local.get('idList', (result) => {
     let idList;
     const input = document.getElementById('item__input');
     const itemList = document.getElementById('itemList');
     if (result.idList) {
-        
-        // 여기서 idList를 사용하여 필요한 작업을 수행하세요.
         idList = result.idList;
-        
-
-        function loadItems() {
-            var n = itemList.childNodes.length
-            for(var i = 0; i < n; i++) {
-                itemList.removeChild(itemList.childNodes[0]);
-            }
-            //itemList.childNodes.forEach(item => itemList.removeChild(item));
-            idList.forEach(item => {
-                
-                const li = addList(item,idList)
-                // li.textContent = item;
-                itemList.appendChild(li);
-            });
-            console.log('읽어온 idList:', idList);
-        }
-
-        document.getElementById('addButton').addEventListener('click', addItem);
-        document.getElementById('item__input').addEventListener('keypress',getEnter);
-        document.getElementById('export').addEventListener('click', exportList);
-        loadItems();
+    } else {
+        idList = [];
     }
+    function loadItems() {
+        var n = itemList.childNodes.length
+        for(var i = 0; i < n; i++) {
+            itemList.removeChild(itemList.childNodes[0]);
+        }
+        //itemList.childNodes.forEach(item => itemList.removeChild(item));
+        idList.forEach(item => {
+            
+            const li = addList(item,idList)
+            // li.textContent = item;
+            itemList.appendChild(li);
+        });
+        console.log('읽어온 idList:', idList);
+    }
+
+    document.getElementById('addButton').addEventListener('click', addItem);
+    document.getElementById('item__input').addEventListener('keypress', getEnter);
+    document.getElementById('export').addEventListener('click', exportList);
+    loadItems();
+    
 
     function addItem() {
         const input = document.getElementById('item__input');
@@ -44,11 +41,11 @@ chrome.storage.local.get('idList', (result) => {
                   });
                 idList.push(input.value);
                 chrome.storage.local.set({idList: idList}, function() {
-                    console.log('리스트에',input,'추가');
+                    console.log('리스트에 "'+input.value+'" 추가');
                 });
             } else {
                 showNotification("이미 존재하는 ID입니다!");
-            }  
+            }
             input.value = '';
         }
     }
@@ -91,12 +88,15 @@ chrome.storage.local.get('idList', (result) => {
             if (index > -1) {
                 li.classList.add('removing');
                 idList.splice(index, 1);
-                li.addEventListener('transitionend', () => {
-                    chrome.storage.local.set({idList: idList}, function() {
-                    console.log('리스트 업데이트 됨' , idList);
-                    });
-                    itemList.removeChild(li);
+                li.addEventListener('transitionend', (e) => {
+                    if(e.propertyName == 'transform') {
+                        chrome.storage.local.set({idList: idList}, function() {
+                            console.log('리스트 업데이트 됨' , idList);
+                        });
+                        li.remove();
+                    }
                 });
+
             }
         }
         const removeText = document.createElement('span');
@@ -124,7 +124,6 @@ chrome.storage.local.get('idList', (result) => {
             url:url,
             filename: `filtering-${now.getTime().toString()}.txt`,
         });
-        console.log(list, "내보내기 성공");
     }
 
     document.getElementById('import').addEventListener('click', function() {
@@ -141,7 +140,7 @@ chrome.storage.local.get('idList', (result) => {
         reader.onload = function(event) {
             try {
                 const content = event.target.result;
-                let newIdList =  JSON.parse(content);
+                let newIdList = JSON.parse(content);
                 newIdList.forEach(item => {
                     if (!idList.includes(item)) {
                         idList.push(item);
@@ -152,6 +151,7 @@ chrome.storage.local.get('idList', (result) => {
                 });
                 loadItems();
             } catch(e) {
+                console.log(e);
                 showNotification("잘못된 파일입니다!");
             }
             
@@ -184,6 +184,8 @@ chrome.storage.local.get('option', (result) => {
             filterManager: false,
             chatLocation: false,
         }
+        filterManagerCheckbox.checked = false;
+        chatLocationCheckbox.checked = false;
     }
 
     filterManagerCheckbox.addEventListener('change', function() {
@@ -224,3 +226,5 @@ function closeNotification() {
 }
 
 document.querySelector(".error__close").addEventListener("click", closeNotification);
+
+
