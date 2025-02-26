@@ -263,9 +263,9 @@ chrome.storage.local.get('idList', (result) => {
 // tempLi.appendChild(captureButton);
 // document.querySelector('.item_box').appendChild(tempLi);
 
-captureButton.addEventListener('click', () => {
-    downLoadFilteredChat();
-});
+// captureButton.addEventListener('click', () => {
+//     downLoadFilteredChat();
+// });
 
 async function downLoadFilteredChat() {
     await changeImageURLtoBase64(filtered);
