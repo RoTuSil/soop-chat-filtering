@@ -11,7 +11,7 @@
     "content_scripts": [
       {
         "matches": ["https://play.sooplive.co.kr/*",
-                    "https://vod.sooplive.co.kr/*"],
+                    "https://vod.sooplive.co.kr/player/*"],
         "js": ["content.js","html2canvas.min.js"]
 
       }

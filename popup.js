@@ -1,34 +1,70 @@
 
 chrome.storage.local.get('idList', (result) => {
     let idList;
+
     const input = document.getElementById('item__input');
     const itemList = document.getElementById('itemList');
+
     if (result.idList) {
         idList = result.idList;
     } else {
         idList = [];
     }
+    document.getElementById('addButton').addEventListener('click', addItem);
+    document.getElementById('item__input').addEventListener('keypress', getEnter);
+    document.getElementById('export').addEventListener('click', exportList);
+
+    document.getElementById('import').addEventListener('click', function() {
+        document.getElementById('fileInput').click(); // 파일 입력 요소 클릭
+    });
+    
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+    
+        if (!file) return;
+    
+        const reader = new FileReader();
+    
+        reader.onload = function(event) {
+            try {
+                const content = event.target.result;
+                let newIdList = JSON.parse(content);
+                newIdList.forEach(item => {
+                    if (!idList.includes(item)) {
+                        idList.push(item);
+                    }
+                });
+                chrome.storage.local.set({idList: idList}, function() {
+                    console.log('리스트 업데이트 됨' , idList);
+                });
+                loadItems();
+            } catch(e) {
+                console.log(e);
+                showNotification("잘못된 파일입니다!");
+            }
+            
+        };
+    
+        reader.onerror = function(event) {
+            showNotification("잘못된 파일입니다!");
+            console.error("파일 읽기 오류:", event.target.error);
+        };
+    
+        reader.readAsText(file);
+    });
+
     function loadItems() {
         var n = itemList.childNodes.length
         for(var i = 0; i < n; i++) {
             itemList.removeChild(itemList.childNodes[0]);
         }
-        //itemList.childNodes.forEach(item => itemList.removeChild(item));
         idList.forEach(item => {
-            
             const li = addList(item,idList)
-            // li.textContent = item;
             itemList.appendChild(li);
         });
         console.log('읽어온 idList:', idList);
     }
-
-    document.getElementById('addButton').addEventListener('click', addItem);
-    document.getElementById('item__input').addEventListener('keypress', getEnter);
-    document.getElementById('export').addEventListener('click', exportList);
-    loadItems();
     
-
     function addItem() {
         const input = document.getElementById('item__input');
         if (input.value.trim() !== '') {
@@ -60,23 +96,19 @@ chrome.storage.local.get('idList', (result) => {
     function addList(input,idList) {
         const li = document.createElement('li');
         const table = document.createElement("table");
-    
-        li.appendChild(table);
-    
         const tr = document.createElement('tr');
-        table.appendChild(tr);
-        table.className = "li-table";
-    
         const textTd = document.createElement("td");
-        tr.appendChild(textTd);
-        textTd.className = "li-id";
-    
         const buttonTd = document.createElement("td");
+
+        li.appendChild(table);
+        table.appendChild(tr);
+        tr.appendChild(textTd);
         tr.appendChild(buttonTd);
+
+        table.className = "li-table";
+        textTd.className = "li-id";
         buttonTd.className = "li-button";
 
-        
-    
         if(input.value)
             textTd.textContent = input.value;
         else textTd.textContent = input
@@ -126,44 +158,7 @@ chrome.storage.local.get('idList', (result) => {
         });
     }
 
-    document.getElementById('import').addEventListener('click', function() {
-        document.getElementById('fileInput').click(); // 파일 입력 요소 클릭
-    });
-    
-    document.getElementById('fileInput').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-    
-        if (!file) return;
-    
-        const reader = new FileReader();
-    
-        reader.onload = function(event) {
-            try {
-                const content = event.target.result;
-                let newIdList = JSON.parse(content);
-                newIdList.forEach(item => {
-                    if (!idList.includes(item)) {
-                        idList.push(item);
-                    }
-                });
-                chrome.storage.local.set({idList: idList}, function() {
-                    console.log('리스트 업데이트 됨' , idList);
-                });
-                loadItems();
-            } catch(e) {
-                console.log(e);
-                showNotification("잘못된 파일입니다!");
-            }
-            
-        };
-    
-        reader.onerror = function(event) {
-            showNotification("잘못된 파일입니다!");
-            console.error("파일 읽기 오류:", event.target.error);
-        };
-    
-        reader.readAsText(file);
-    });
+    loadItems();
 });
 
 
