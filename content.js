@@ -109,6 +109,7 @@ let option = [];
 
 const chat = document.querySelector('.chatting-viewer')
 const filtered = chat.cloneNode(true);
+const maxFilterLength = 50;
 
 // resizer 생성
 const resizer = document.createElement('div');
@@ -203,85 +204,112 @@ chrome.storage.local.get('resizeHeight', (result) => {
 
 
 chrome.storage.local.get('idList', (result) => {
-    if (result.idList) {
-        console.log('읽어온 idList:', result.idList);
-        const liveArea = chat;
-        
-        idList = result.idList;
-
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if(mutation.addedNodes.length > 50) {
-                    let time = new Date();
-                    let timeString = time.toLocaleTimeString();
-                    console.log(timeString + " / 채팅 업데이트 개수 : " + mutation.addedNodes.length);
-                }
-                // 추가된 노드가 있을 경우
-                if (mutation.addedNodes.length) {
-                    mutation.addedNodes.forEach((node) => {
-                        // 추가된 노드가 chatting-list-item인지 확인
-                        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('chatting-list-item')) {
-                            if(node.querySelector(".message-container")) {
-                                button = node.querySelector("button");
-                                for(;filtered.childNodes.length>50;) {
-                                    filtered.childNodes[0].remove();
-                                }
-
-                                const copied = node.cloneNode(true);
-
-                                const userIdButton = copied.querySelector('button')
-                                if(userIdButton == null) return;
-                                userId = userIdButton.getAttribute('user_id').replace(/\(.*$/, '');
-                                var isManager = userIdButton.getAttribute('grade') == 'manager';
-                                if(idList.includes(userId) || (option.filterManager && isManager)) {    
-                                    filtered.appendChild(copied);
-                                    filtered.scrollTop = filtered.scrollHeight;
-                                }
-                            }
-                        }
-                    });
-                }
-            });
-        });
-        observer.observe(liveArea, {
-            childList: true,
-            subtree: true   
-        });
-    }
-    else {
+    if(!result.idList) {
         idList = [];
         chrome.storage.local.set({idList: idList});
+        return;
     }
+
+    console.log('읽어온 idList:', result.idList);
+    const liveArea = chat;
+    
+    idList = result.idList;
+
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if(mutation.addedNodes.length > 50) {
+                let time = new Date();
+                let timeString = time.toLocaleTimeString();
+                console.log(timeString + " / 채팅 업데이트 개수 : " + mutation.addedNodes.length);
+            }
+            // 추가된 노드가 있을 경우
+            if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach((node) => {
+                    // 추가된 노드가 chatting-list-item인지 확인
+                    if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('chatting-list-item')) {
+                        if(node.querySelector(".message-container")) {
+                            button = node.querySelector("button");
+                            for(;filtered.childNodes.length>maxFilterLength;) {
+                                filtered.childNodes[0].remove();
+                            }
+
+                            const copied = node.cloneNode(true);
+
+                            const userIdButton = copied.querySelector('button')
+                            if(userIdButton == null) return;
+                            userId = userIdButton.getAttribute('user_id').replace(/\(.*$/, '');
+                            var isManager = userIdButton.getAttribute('grade') == 'manager';
+                            if(idList.includes(userId) || (option.filterManager && isManager)) {    
+                                filtered.appendChild(copied);
+                                filtered.scrollTop = filtered.scrollHeight;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    });
+    observer.observe(liveArea, {
+        childList: true,
+        subtree: true   
+    });
+    
 });
 
 //캡쳐 버튼 추가
-// const tempLi = document.createElement('li');
-// const captureButton = document.createElement('a');
-// tempLi.classList.add('capture');
-// captureButton.textContent = '캡쳐';
-// captureButton.setAttribute('tip', '채팅 필터 캡쳐');
-// tempLi.appendChild(captureButton);
-// document.querySelector('.item_box').appendChild(tempLi);
 
-// captureButton.addEventListener('click', () => {
-//     downLoadFilteredChat();
-// });
+const tempLi = document.createElement('li');
+const captureButton = document.createElement('a');
+tempLi.classList.add('capture');
+captureButton.textContent = '캡쳐';
+captureButton.setAttribute('tip', '채팅 필터 캡쳐');
+tempLi.appendChild(captureButton);
+document.querySelector('.item_box').appendChild(tempLi);
+
+captureButton.addEventListener('click', () => {
+    downLoadFilteredChat();
+});
 
 async function downLoadFilteredChat() {
     await changeImageURLtoBase64(filtered);
-    html2canvas(filtered, {
-        allowTaint: false,
-        useCORS: false,
-        ignoreElements: (element) => element.tagName === 'VIDEO'
-    }).then(canvas => {
-        canvas.toBlob(blob => {
-            const link = document.createElement('a');
-            link.download = `${new Date().getTime()}.png`;
-            link.href = URL.createObjectURL(blob);
-            link.click();
-            link.remove();
-        });
+
+    let cloned = filtered.cloneNode(true);
+    
+
+    cloned.querySelectorAll("button").forEach(button => {
+        button.style.width = "120px";
+        console.log(button.clientWidth);
     });
+
+    cloned.style.width = filtered.clientWidth + 'px';
+    //console.log(cloned.style.width);
+    
+    //cloned.style.height = filtered.style.height;
+    
+    cloned.style.overflow = 'visible';
+    cloned.scrollTop = filtered.scrollTop;
+
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.top = '-9999px';
+    container.style.left = '-9999px';
+    container.appendChild(cloned);
+    document.body.appendChild(container);
+
+    await domtoimage.toJpeg(cloned, { 
+        style : {
+            height: filtered.style.height + 'px',
+            width: filtered.scrollWidth + 'px'
+        }
+     })
+    .then(function (dataUrl) {
+        var link = document.createElement('a');
+        link.download = 'my-image-name.jpeg';
+        link.href = dataUrl;
+        link.click();
+    });
+
+    container.remove();
 }
 
 async function changeImageURLtoBase64(container) {
@@ -291,7 +319,7 @@ async function changeImageURLtoBase64(container) {
     const imgList = Array.from(imgAll).filter(img => !img.src.startsWith('data:image'));
 
     const svgList = Array.from(container.querySelectorAll("span")).filter(
-        span => span.classList.contains("grade-badge-fan")
+        span => ["grade-badge-fan", "grade-badge-vip", "grade-badge-manager"].some(cls => span.classList.contains(cls))
     );
     const svgPromises = svgList.map(async svg => {
         const backgroundImage =  window.getComputedStyle(svg).backgroundImage;
@@ -300,6 +328,7 @@ async function changeImageURLtoBase64(container) {
         svgElement.innerHTML = decodeURIComponent(svgData);
         svgElement.setAttribute('width', '15px');
         svgElement.setAttribute('height', '15px');
+        svgElement.style.verticalAlign = 'middle';
         svg.parentNode.replaceChild(svgElement, svg);
     });
     const imgPromises = imgList.map(async img => {
