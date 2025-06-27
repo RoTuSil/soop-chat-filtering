@@ -282,26 +282,26 @@ waitForElement('.chatting-viewer', (chat) => {
 
     //캡쳐 버튼 추가
 
-    const tempLi = document.createElement('li');
-    const captureButton = document.createElement('a');
-    tempLi.classList.add('capture');
-    captureButton.textContent = '캡쳐';
-    captureButton.setAttribute('tip', '채팅 필터 캡쳐');
-    tempLi.appendChild(captureButton);
-    document.querySelector('.item_box').appendChild(tempLi);
+    // const tempLi = document.createElement('li');
+    // const captureButton = document.createElement('a');
+    // tempLi.classList.add('capture');
+    // captureButton.textContent = '캡쳐';
+    // captureButton.setAttribute('tip', '채팅 필터 캡쳐');
+    // tempLi.appendChild(captureButton);
+    // document.querySelector('.item_box').appendChild(tempLi);
 
-    captureButton.addEventListener('click', () => {
-        selectMode = !selectMode;
+    // captureButton.addEventListener('click', () => {
+    //     selectMode = !selectMode;
         
-        downLoadFilteredChat();
-        if(selectMode) {
-            // filtered.childNodes.forEach((node) => {
-            //     node.classList.
-            // }
-        }
-        else {
-        }
-    });
+    //     downLoadFilteredChat();
+    //     if(selectMode) {
+    //         // filtered.childNodes.forEach((node) => {
+    //         //     node.classList.
+    //         // }
+    //     }
+    //     else {
+    //     }
+    // });
 
     async function downLoadFilteredChat() {
         await changeImageURLtoBase64(filtered);
