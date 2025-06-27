@@ -4,6 +4,10 @@ chrome.runtime.onInstalled.addListener(() => {
         title: '해당 유저 필터링에 추가',
         type: 'normal',
         contexts: ['all'],
+        documentUrlPatterns: [
+            "https://play.sooplive.co.kr/*",
+            "https://vod.sooplive.co.kr/player/*"
+        ]
     });
 });
 
