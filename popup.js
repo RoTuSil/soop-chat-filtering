@@ -5,6 +5,7 @@ const ID_ADD_BUTTON = 'addButton';
 const ID_EXPORT = 'export';
 const ID_IMPORT = 'import';
 const ID_FILE_INPUT = 'fileInput';
+const ID_FILTER_STREAMER = 'filter-streamer';
 const ID_FILTER_MANAGER = 'filter-manager';
 const ID_CHAT_LOCATION = 'chat-location';
 const CLASS_ERROR = 'error';
@@ -111,9 +112,10 @@ chrome.storage.local.get('idList', (result) => {
             if (index === -1) return;
             li.classList.add('removing');
             idList.splice(index, 1);
+            chrome.storage.local.set({idList: idList});
+
             li.addEventListener('transitionend', (e) => {
                 if(e.propertyName == 'transform') {
-                    chrome.storage.local.set({idList: idList});
                     li.remove();
                 }
             });
@@ -148,15 +150,25 @@ chrome.storage.local.get('idList', (result) => {
 
 // 옵션(설정) 불러오기 및 UI 반영
 chrome.storage.local.get('option', (result) => {
-    let option = result.option || { filterManager: false, chatLocation: false };
+    let option = result.option || { filterManager: false, chatLocation: false, filterStreamer: false};
+    const filterStreamerCheckbox = document.getElementById(ID_FILTER_STREAMER);
     const filterManagerCheckbox = document.getElementById(ID_FILTER_MANAGER);
     const chatLocationCheckbox = document.getElementById(ID_CHAT_LOCATION);
+
+    filterStreamerCheckbox.checked = option.filterStreamer;
     filterManagerCheckbox.checked = option.filterManager;
     chatLocationCheckbox.checked = option.chatLocation;
+
+    filterStreamerCheckbox.addEventListener('change', function() {
+        option.filterStreamer = filterStreamerCheckbox.checked;
+        saveOption();
+    });
+
     filterManagerCheckbox.addEventListener('change', function() {
         option.filterManager = filterManagerCheckbox.checked;
         saveOption();
     });
+
     chatLocationCheckbox.addEventListener('change', function() {
         option.chatLocation = chatLocationCheckbox.checked;
         saveOption();

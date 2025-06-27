@@ -159,6 +159,7 @@ waitForElement('.chatting-viewer', (chat) => {
             option = result.option;
         } else {
             option = {
+                filterStreamer: false,
                 filterManager: false,
                 chatLocation: false,
             }
@@ -265,8 +266,10 @@ waitForElement('.chatting-viewer', (chat) => {
                     if (userId) {
                         userId = userId.replace(/\(.*$/, '');
                     }
-                    var isManager = userIdButton.getAttribute('grade') == 'manager';
-                    if (idList.includes(userId) || (option.filterManager && isManager)) {
+                    var isManager = userIdButton.getAttribute('grade') == 'manager'; // TODO 다시보기에서 어떻게 되는지 확인해야함
+                    var isStreamer = userIdButton.getAttribute('grade') == '0' || userIdButton.querySelector('span[grade]').getAttribute('grade') == 0; //TODO 다시보기 말고 라이브채팅에서 어떻게 되는지 확인해야함
+
+                    if (idList.includes(userId) || (option.filterManager && isManager) || (option.filterStreamer && isStreamer)) {
                         filtered.appendChild(copied);
                         filtered.scrollTop = filtered.scrollHeight;
                     }
@@ -282,26 +285,26 @@ waitForElement('.chatting-viewer', (chat) => {
 
     //캡쳐 버튼 추가
 
-    const tempLi = document.createElement('li');
-    const captureButton = document.createElement('a');
-    tempLi.classList.add('capture');
-    captureButton.textContent = '캡쳐';
-    captureButton.setAttribute('tip', '채팅 필터 캡쳐');
-    tempLi.appendChild(captureButton);
-    document.querySelector('.item_box').appendChild(tempLi);
+    // const tempLi = document.createElement('li');
+    // const captureButton = document.createElement('a');
+    // tempLi.classList.add('capture');
+    // captureButton.textContent = '캡쳐';
+    // captureButton.setAttribute('tip', '채팅 필터 캡쳐');
+    // tempLi.appendChild(captureButton);
+    // document.querySelector('.item_box').appendChild(tempLi);
 
-    captureButton.addEventListener('click', () => {
-        selectMode = !selectMode;
+    // captureButton.addEventListener('click', () => {
+    //     selectMode = !selectMode;
         
-        downLoadFilteredChat();
-        if(selectMode) {
-            // filtered.childNodes.forEach((node) => {
-            //     node.classList.
-            // }
-        }
-        else {
-        }
-    });
+    //     downLoadFilteredChat();
+    //     if(selectMode) {
+    //         // filtered.childNodes.forEach((node) => {
+    //         //     node.classList.
+    //         // }
+    //     }
+    //     else {
+    //     }
+    // });
 
     async function downLoadFilteredChat() {
         await changeImageURLtoBase64(filtered);
