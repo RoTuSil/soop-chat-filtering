@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "SOOP 채팅 콜렉터",
     "description": "지정한 ID의 채팅만을 따로 보여주는 확장 프로그램입니다.",
-    "version": "1.0",
+    "version": "1.0.11",
     "action": {
       "default_icon": "icon.png",
       "default_popup": "popup.html"

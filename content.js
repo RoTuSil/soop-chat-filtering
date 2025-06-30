@@ -246,6 +246,7 @@ waitForElement('.chatting-viewer', (chat) => {
                     if (!node.querySelector(".message-container")) return;
 
                     button = node.querySelector("button");
+                    
                     for (; filtered.childNodes.length > maxFilterLength;) {
                         filtered.childNodes[0].remove();
                     }
@@ -256,8 +257,8 @@ waitForElement('.chatting-viewer', (chat) => {
                     if (userIdButton == null) return;
                     let userId = userIdButton.getAttribute('user_id');
                     if (!userId) {
-                        // user_id가 null이면 img에서 user_id를 찾음
-                        const img = copied.querySelector('img[user_id]');
+                        // user_id가 null이면 span에서 user_id를 찾음
+                        const img = copied.querySelector('span[user_id]');
                         if (img) {
                             userId = img.getAttribute('user_id');
                         }
@@ -265,7 +266,13 @@ waitForElement('.chatting-viewer', (chat) => {
                     if (userId) {
                         userId = userId.replace(/\(.*$/, '');
                     }
-                    var isManager = userIdButton.getAttribute('grade') == 'manager';
+                    var isManagerLive = userIdButton.getAttribute('grade') == 'manager';
+                    var isManagerVOD = userIdButton.querySelector('span[grade]').getAttribute('grade') == '1';
+
+                    // var isStreamerLive = ""; // TODO 생방송에서 어떻게 뜨는지 보고 수정해야 함
+
+                    // var isStreamerVOD = userIdButton.querySelector('span[grade]').getAttribute('grade') == '0';
+                    var isManager = isManagerLive || isManagerVOD;
                     if (idList.includes(userId) || (option.filterManager && isManager)) {
                         filtered.appendChild(copied);
                         filtered.scrollTop = filtered.scrollHeight;
