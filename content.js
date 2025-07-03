@@ -266,13 +266,16 @@ waitForElement('.chatting-viewer', (chat) => {
                     if (userId) {
                         userId = userId.replace(/\(.*$/, '');
                     }
-                    var isManagerLive = userIdButton.getAttribute('grade') == 'manager';
-                    var isManagerVOD = userIdButton.querySelector('span[grade]').getAttribute('grade') == '1';
 
-                    // var isStreamerLive = ""; // TODO 생방송에서 어떻게 뜨는지 보고 수정해야 함
+                    var isManagerLive = (userIdButton.getAttribute('grade') || '') === 'manager';
+                    var isManagerVOD = ((userIdButton.querySelector('span[grade]') && userIdButton.querySelector('span[grade]').getAttribute('grade')) || '') === '1';
 
-                    // var isStreamerVOD = userIdButton.querySelector('span[grade]').getAttribute('grade') == '0';
+                    var isStreamerLive = (userIdButton.getAttribute('grade') || '') === 'bj'; // TODO 생방송에서 어떻게 뜨는지 보고 수정해야 함
+                    var isStreamerVOD = ((userIdButton.querySelector('span[grade]') && userIdButton.querySelector('span[grade]').getAttribute('grade')) || '') === '0';
+
                     var isManager = isManagerLive || isManagerVOD;
+                    var isStreamer = isStreamerLive || isStreamerVOD;
+
                     if (idList.includes(userId) || (option.filterManager && isManager)) {
                         filtered.appendChild(copied);
                         filtered.scrollTop = filtered.scrollHeight;
@@ -452,7 +455,7 @@ waitForElement('.chatting-viewer', (chat) => {
             info.classList.add("good");
         }
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {removeNoti();}, 5000);
+        timeoutId = setTimeout(() => {removeNoti();}, 2000);
     }
 
     function removeNoti() {
